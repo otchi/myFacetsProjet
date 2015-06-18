@@ -1,6 +1,11 @@
 package org.amine.recherche;
 
+
+
+import io.searchbox.core.search.facet.TermsFacet.Term;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -60,17 +65,22 @@ public class ActionRecherche extends HttpServlet {
 	public int search(QueryKind queryKind) throws IOException{
 		 RechercheVoiture rechercheVoiture=new RechercheVoiture("http://localhost:9200");
 		   HashMap<String, String> fieldsSelect=new HashMap<String, String>();
+		   
 	    if((!newSearch)&&((Integer)session.getAttribute("from")) >= (Integer)session.getAttribute("count"))
-	    	session.setAttribute("from", (Integer)session.getAttribute("from")-size);;
-	    
+	    	session.setAttribute("from", (Integer)session.getAttribute("from")-size);
+	    if(request.getParameter("us")!=null) 
+	    	System.out.println("++++++!!!!!!!!!!!!!!!!!!!+++++++++++++++"+(request.getParameter("us").equals("on")));
 	    fieldsSelect.put("voiture",(request.getParameter("searchByName").toLowerCase()));
 	    
 	    rechercheVoiture.putPagination((Integer)session.getAttribute("from"), size);
 	    rechercheVoiture.putQuery(fieldsSelect, queryKind);
+	    
+	    
 	    if(!request.getParameter("minVitesse").equals("")&&!request.getParameter("maxVitesse").equals("")){
 	    	rechercheVoiture.putIntervaleFilter("vitesseMax",
 	    			Integer.parseInt(request.getParameter("minVitesse")),
 	    			Integer.parseInt(request.getParameter("maxVitesse")));
+	    	
 	    		request.setAttribute("minVitesse",request.getParameter("minVitesse"));
 	    		request.setAttribute("maxVitesse",request.getParameter("maxVitesse"));
 	    	
@@ -86,7 +96,15 @@ public class ActionRecherche extends HttpServlet {
 		}													
 		request.setAttribute("searchByName",request.getParameter("searchByName"));
 		request.setAttribute("voitures", voitures);
-		request.setAttribute("facet", voitureResp.getMyFacet().getFacettingIterator());
+		
+		
+		if(this.session.getAttribute("origineFacet")==null){
+			this.session.setAttribute("origineFacet",voitureResp.getMyFacet().getFacetting() );
+			}else{
+			
+			}
+		
+		request.setAttribute("facet", voitureResp.getMyFacet().getFacetting().iterator());
 		return voitureResp.getCount();
 	}
 	/**

@@ -48,6 +48,13 @@ public class JsonArrayFactory implements JsonElementFactory{
 		return this;
 	}
 	
+	public JsonElementFactory putValue(String value){
+		JsonObject jsonObject=new JsonObject();
+		jsonObject.addProperty("", value);
+		this.jsonElement.add(jsonObject.get(""));
+		return this;
+	}
+	
 	public JsonElement getJsonElement() {
 		// TODO Auto-generated method stub
 		return this.jsonElement;

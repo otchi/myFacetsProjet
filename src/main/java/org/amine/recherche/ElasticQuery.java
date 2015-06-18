@@ -111,20 +111,27 @@ public class ElasticQuery {
 	
 		JsonUtile.selection("query,filtered,filter,bool,must", this.jsonObject)
 				 .getAsJsonArray()
-				 .add(  	new JsonObjectFactory("range")
-								.putElement( 
+				 .add(  new JsonObjectFactory("range")
+							.putElement( 
 									new JsonObjectFactory(field )
 										.putProperty("gte", gle)
 										.putProperty("lte", lte))
-						.get() 
+							.get() 
 					);
 						 
-					/*	 
-						 "range" ,
-						 new JsonObjectFactory(field )
-				 			.putProperty("gte", ""+gle)
-				 			.putProperty("lte", ""+lte)
-				 			.get());*/
+	
+	}
+/**************************************************************************************/
+	public void filterTerm(String field,String[] values ){
+		
+		JsonArrayFactory jsaf=new JsonArrayFactory(field);
+		for(int i=0;i<values.length;i++){
+			jsaf.putValue(values[i]);
+		}
+		JsonUtile.selection("query,filtered,filter,bool,must", this.jsonObject)
+		 .getAsJsonArray().add(new JsonObjectFactory("terms").putElement(jsaf).get());
+		
+		
 	}
 /***************************************************************************************/
 	// product facet with a with a given field
@@ -158,16 +165,14 @@ public class ElasticQuery {
 		
 		ElasticQuery eq=new ElasticQuery();
 		
-		//System.out.println(eq.requestBone());
-		//eq.prefix("voiture","ca");
 		eq.from(10);
 		eq.size(100);
 		eq.filterRange("cylendres", 4, 4);
 		eq.termFacetting("origine");
 		eq.match("voiture","chevrolet","or");
-		//eq.prefix("voiture", "ch");
 		eq.sort("id", "asc");
-		//Seq.match_all();
+		String[] s={"us"};
+		eq.filterTerm("origine", s);
 		
 		System.out.println(	
 				eq.getJsonObject());

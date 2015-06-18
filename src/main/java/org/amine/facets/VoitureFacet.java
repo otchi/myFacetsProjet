@@ -29,8 +29,8 @@ public class VoitureFacet {
 		}
 	}
 	
-	public Iterator<Term> getFacettingIterator(){
-		return this.facetting.iterator();
+	public ArrayList<Term> getFacetting(){
+		return this.facetting;
 	}
 	public String getName() {
 		return name;
@@ -92,7 +92,7 @@ public class VoitureFacet {
 	         +"]"
 	     +" }}").getAsJsonObject();
 		VoitureFacet myFacets=new VoitureFacet(jso,"origine");
-		Iterator<Term> facetIter=myFacets.getFacettingIterator();
+		Iterator<Term> facetIter=myFacets.getFacetting().iterator();
 		while(facetIter.hasNext()){
 			Term t=facetIter.next();
 			System.out.println(t.getTerm()+"///"+t.getCount());

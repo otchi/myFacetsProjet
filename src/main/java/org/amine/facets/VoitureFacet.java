@@ -62,6 +62,10 @@ public class VoitureFacet {
 			return count;
 		}
 
+		public void setCount(int count) {
+			this.count = count;
+		}
+
 		public boolean getIsCheked() {
 			return isCheked;
 		}

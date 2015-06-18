@@ -2,7 +2,7 @@ package org.amine.recherche;
 
 
 
-import io.searchbox.core.search.facet.TermsFacet.Term;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.amine.facets.VoitureFacet.Term;
 import org.amine.index.Voiture;
 
 
@@ -54,22 +55,44 @@ public class ActionRecherche extends HttpServlet {
 	    if(request.getParameter("search")!=null){ 
 	    	from=0;
 	    	newSearch=true;
-	    	
-	    	
 	    }
 	    
 	    session.setAttribute("from",from);
 	}
 
 	
+	@SuppressWarnings("unchecked")
+	
 	public int search(QueryKind queryKind) throws IOException{
 		 RechercheVoiture rechercheVoiture=new RechercheVoiture("http://localhost:9200");
-		   HashMap<String, String> fieldsSelect=new HashMap<String, String>();
+		 HashMap<String, String> fieldsSelect=new HashMap<String, String>();
+		 String facetValues="";
 		   
 	    if((!newSearch)&&((Integer)session.getAttribute("from")) >= (Integer)session.getAttribute("count"))
 	    	session.setAttribute("from", (Integer)session.getAttribute("from")-size);
-	    if(request.getParameter("us")!=null) 
-	    	System.out.println("++++++!!!!!!!!!!!!!!!!!!!+++++++++++++++"+(request.getParameter("us").equals("on")));
+	 /*   if(request.getParameter("us")!=null) 
+	    	System.out.println("++++++!!!!!!!!!!!!!!!!!!!+++++++++++++++"+(request.getParameter("us").equals("on")));*/
+	    
+	  if(this.session.getAttribute("facet")!=null){
+	    	ArrayList<Term> origineFacet=(ArrayList<Term>)this.session.getAttribute("facet");
+	    	for(Term ot:origineFacet){ 
+	    		System.out.println("--------------------------------------");
+	    		System.out.println(request.getParameter(ot.getTerm()));
+	    		System.out.println("--------------------------------------");
+	    		if(request.getParameter(ot.getTerm())!=null){
+	    			ot.setCheked(true);
+	    			if(!facetValues.equals(""))facetValues+=",";
+	    			facetValues+=ot.getTerm();
+	    		}else{
+	    			ot.setCheked(false);
+	    		}
+	    	}
+	    	this.session.setAttribute("facet", origineFacet);
+	    }
+	    
+	    
+	    String[] values=facetValues.split(",");
+	    if(!facetValues.equals("")) rechercheVoiture.putTermFilter("origine", values);
 	    fieldsSelect.put("voiture",(request.getParameter("searchByName").toLowerCase()));
 	    
 	    rechercheVoiture.putPagination((Integer)session.getAttribute("from"), size);
@@ -97,14 +120,26 @@ public class ActionRecherche extends HttpServlet {
 		request.setAttribute("searchByName",request.getParameter("searchByName"));
 		request.setAttribute("voitures", voitures);
 		
-		
-		if(this.session.getAttribute("origineFacet")==null){
-			this.session.setAttribute("origineFacet",voitureResp.getMyFacet().getFacetting() );
-			}else{
+	/*********** il ya negligence dans le code ******************************/	
+		if(this.session.getAttribute("facet")==null){
+			this.session.setAttribute("facet",voitureResp.getMyFacet().getFacetting());
+			this.request.setAttribute("facet", voitureResp.getMyFacet().getFacetting().iterator());
+		}else{
+			this.request.setAttribute("facet", this.session.getAttribute("facet"));
 			
-			}
-		
-		request.setAttribute("facet", voitureResp.getMyFacet().getFacetting().iterator());
+			//ArrayList<Term> newFacet=voitureResp.getMyFacet().getFacetting();
+			/*for(Term ot:origineFacet){
+				for(Term nt:newFacet){
+				//	if(ot.getTerm().equals(nt.getTerm()))
+						//ot.setCount(nt.getCount());
+					//else ot.setCount(0);
+				}
+			}*/
+			
+		}
+		//ArrayList<Term> origineFacet=(ArrayList<Term>)this.session.getAttribute("facet");
+		//this.request.setAttribute("facet", origineFacet.iterator());
+		//request.setAttribute("facet", voitureResp.getMyFacet().getFacetting().iterator());
 		return voitureResp.getCount();
 	}
 	/**

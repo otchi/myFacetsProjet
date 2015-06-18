@@ -113,6 +113,9 @@ public class RechercheVoiture {
 	public void putIntervaleFilter(String field,double gle,double lte){
 		this.eQuery.filterRange(field,gle, lte);
 	}
+	public void putTermFilter(String field,String[] values){
+		this.eQuery.filterTerm(field, values);
+	}
 	
 	public void putFacetting(String field){
 		this.eQuery.termFacetting(field);
@@ -133,7 +136,7 @@ public class RechercheVoiture {
 		System.out.println(rv.eQuery.getJsonObject());
 		VoitureResponce voitureResp=rv.getResults("origine");
 		VoitureFacet myFacet=voitureResp.getMyFacet();
-		Iterator<Term> facetIter=myFacet.getFacettingIterator();
+		Iterator<Term> facetIter=myFacet.getFacetting().iterator();
 		
 		while(facetIter.hasNext())System.out.println(facetIter.next().getTerm());
 		

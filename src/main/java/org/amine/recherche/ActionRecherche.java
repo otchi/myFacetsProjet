@@ -89,7 +89,7 @@ public class ActionRecherche extends HttpServlet {
 	    	}
 	    	this.session.setAttribute("facet", origineFacet);
 	    }
-	    
+	   
 	    
 	    String[] values=facetValues.split(",");
 	    if(!facetValues.equals("")) rechercheVoiture.putTermFilter("origine", values);

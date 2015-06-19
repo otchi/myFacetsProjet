@@ -35,7 +35,15 @@ table {
  	<label>pagination : <input class="numberInput" type="text" name="size" value="${size}"></label><br><br>
 	<c:forEach items="${facet}" var="term">
 			<c:out value="${term.term}(${term.count})"></c:out>
-			<input type="checkbox" name="${term.term}" checked="${term.isCheked}"><br>
+			<c:choose>
+			  <c:when test="${term.isCheked}">
+			  	<input type="checkbox" name="${term.term}" checked="checked"><br>
+			  </c:when>
+			  <c:otherwise>
+			  	<input type="checkbox" name="${term.term}"><br>
+			  </c:otherwise>
+			</c:choose>
+			
 	</c:forEach>
 	
 	<button type="submit" name="search">Search</button><br><br><br>
